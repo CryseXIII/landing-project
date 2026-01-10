@@ -81,6 +81,7 @@ function App() {
 				<Button text="Go to Hello World →" to="/hello" />
 				<Button text="API Documentation →" to="/api-docs" />
 				<Button text="📚 Dokumentation (DE) →" to="/documentation" />
+				<Button text="📜 Log Viewer →" to="/log-viewer" />
 			</div>
 			<p className="read-the-docs">
 				Click on the Vite and React logos to learn more

@@ -7,6 +7,7 @@ import App from './App.jsx'
 import HelloWorld from './pages/HelloWorld.jsx'
 import ApiDocs from './pages/ApiDocs.jsx'
 import Documentation from './pages/Documentation.jsx'
+import LogViewer from './pages/LogViewer.jsx'
 import Login from './components/Login.jsx'
 
 createRoot(document.getElementById('root')).render(
@@ -18,6 +19,7 @@ createRoot(document.getElementById('root')).render(
 				<Route path="/hello" element={<HelloWorld />} />
 				<Route path="/api-docs" element={<ApiDocs />} />
 				<Route path="/documentation" element={<Documentation />} />
+				<Route path="/log-viewer" element={<LogViewer />} />
 			</Routes>
 		</BrowserRouter>
 	</StrictMode>,

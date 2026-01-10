@@ -5,6 +5,7 @@ import { loadEnvironment, getEnvironmentInfo } from './config/env-loader.js';
 import { logger } from './utils/logger.js';
 import authRoutes from './routes/auth.js';
 import apiRoutes from './routes/api.js';
+import logsRoutes from './routes/logs.js';
 
 // Load environment configuration
 const env = loadEnvironment();
@@ -37,6 +38,7 @@ app.use((req, res, next) => {
 // Routes
 app.use('/auth', authRoutes);
 app.use('/api', apiRoutes);
+app.use('/logs', logsRoutes);
 
 // Health check
 app.get('/health', (req, res) => {

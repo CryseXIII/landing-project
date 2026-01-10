@@ -1,193 +1,218 @@
-/**
- * Server-Side Logger with Icons, Colors, Timestamps, and Source Tracking
- * 
- * Log Levels: debug, info, success, warn, error, fatal
- * Each log includes: timestamp, level, icon, color, source, message
- * Log level controlled by LOG_LEVEL_SERVER environment variable
- */
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-// ANSI color codes for terminal
-const colors = {
-	reset: '\x1b[0m',
-	bright: '\x1b[1m',
-	dim: '\x1b[2m',
-	
-	// Text colors
-	red: '\x1b[31m',
-	green: '\x1b[32m',
-	yellow: '\x1b[33m',
-	blue: '\x1b[34m',
-	magenta: '\x1b[35m',
-	cyan: '\x1b[36m',
-	white: '\x1b[37m',
-	gray: '\x1b[90m',
-	
-	// Background colors
-	bgRed: '\x1b[41m',
-	bgGreen: '\x1b[42m',
-	bgYellow: '\x1b[43m',
-	bgBlue: '\x1b[44m',
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Configuration
+const CONFIG = {
+	logsDir: path.join(__dirname, '../../logs/server'),
+	maxFileSize: 100 * 1024 * 1024, // 100MB in bytes
+	maxFiles: 10, // Maximum number of log files to keep
+	maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days in milliseconds
+	encoding: 'utf8',
 };
 
-// Log level hierarchy
+// Log levels with icons and colors
 const LOG_LEVELS = {
-	debug: 0,
-	info: 1,
-	success: 2,
-	warn: 3,
-	error: 4,
-	fatal: 5,
-	none: 999,
+	debug: { priority: 0, icon: '🐛', color: '\x1b[36m' },
+	info: { priority: 1, icon: 'ℹ️', color: '\x1b[34m' },
+	success: { priority: 2, icon: '✅', color: '\x1b[32m' },
+	warn: { priority: 3, icon: '⚠️', color: '\x1b[33m' },
+	error: { priority: 4, icon: '❌', color: '\x1b[31m' },
+	fatal: { priority: 5, icon: '💀', color: '\x1b[35m' },
 };
 
-// Icons for each log level
-const ICONS = {
-	debug: '🐛',
-	info: 'ℹ️ ',
-	success: '✅',
-	warn: '⚠️ ',
-	error: '❌',
-	fatal: '💀',
-	http: '🌐',
-	auth: '🔐',
-	db: '💾',
-	api: '🔌',
-};
+const RESET = '\x1b[0m';
+const currentLogLevel = process.env.LOG_LEVEL_SERVER || 'debug';
 
-// Color mapping for log levels
-const LEVEL_COLORS = {
-	debug: colors.gray,
-	info: colors.blue,
-	success: colors.green,
-	warn: colors.yellow,
-	error: colors.red,
-	fatal: colors.bgRed + colors.white + colors.bright,
-};
-
-class ServerLogger {
-	constructor() {
-		this.logLevel = process.env.LOG_LEVEL_SERVER || 'info';
-		this.minLevel = LOG_LEVELS[this.logLevel] || LOG_LEVELS.info;
-		this.enableRequestLogging = process.env.ENABLE_REQUEST_LOGGING === 'true';
-	}
-
-	/**
-	 * Format timestamp
-	 */
-	getTimestamp() {
-		const now = new Date();
-		return now.toISOString();
-	}
-
-	/**
-	 * Core log function
-	 * @param {string} level - Log level (debug, info, success, warn, error, fatal)
-	 * @param {string} source - Source of the log (e.g., 'AuthController', 'API', 'Database')
-	 * @param {string} message - Log message
-	 * @param {object} data - Additional data to log
-	 */
-	log(level, source, message, data = null) {
-		const levelValue = LOG_LEVELS[level];
-		
-		// Skip if below minimum log level
-		if (levelValue < this.minLevel) {
-			return;
-		}
-
-		const timestamp = this.getTimestamp();
-		const icon = ICONS[level] || '📝';
-		const color = LEVEL_COLORS[level] || colors.white;
-		
-		// Format the log message
-		const logParts = [
-			colors.dim + timestamp + colors.reset,
-			color + icon + ' ' + level.toUpperCase().padEnd(7) + colors.reset,
-			colors.cyan + '[' + source + ']' + colors.reset,
-			message,
-		];
-
-		const logLine = logParts.join(' ');
-		console.log(logLine);
-
-		// Log additional data if provided
-		if (data) {
-			console.log(colors.gray + JSON.stringify(data, null, 2) + colors.reset);
-		}
-	}
-
-	/**
-	 * Debug level - detailed diagnostic info
-	 */
-	debug(source, message, data = null) {
-		this.log('debug', source, message, data);
-	}
-
-	/**
-	 * Info level - general informational messages
-	 */
-	info(source, message, data = null) {
-		this.log('info', source, message, data);
-	}
-
-	/**
-	 * Success level - successful operations
-	 */
-	success(source, message, data = null) {
-		this.log('success', source, message, data);
-	}
-
-	/**
-	 * Warn level - warning messages
-	 */
-	warn(source, message, data = null) {
-		this.log('warn', source, message, data);
-	}
-
-	/**
-	 * Error level - error messages
-	 */
-	error(source, message, data = null) {
-		this.log('error', source, message, data);
-	}
-
-	/**
-	 * Fatal level - critical errors that require immediate attention
-	 */
-	fatal(source, message, data = null) {
-		this.log('fatal', source, message, data);
-	}
-
-	/**
-	 * HTTP request logger
-	 */
-	http(method, path, status, duration) {
-		if (!this.enableRequestLogging) return;
-
-		const statusColor = status < 300 ? colors.green : status < 400 ? colors.yellow : colors.red;
-		const message = `${method.padEnd(6)} ${path} ${statusColor}${status}${colors.reset} ${colors.dim}(${duration}ms)${colors.reset}`;
-		
-		this.log('info', 'HTTP', message);
-	}
-
-	/**
-	 * API endpoint logger
-	 */
-	api(endpoint, operation, success, duration = null) {
-		const level = success ? 'success' : 'error';
-		const message = `${endpoint} - ${operation}${duration ? ` (${duration}ms)` : ''}`;
-		this.log(level, 'API', message);
-	}
-
-	/**
-	 * Authentication logger
-	 */
-	auth(event, username, success, details = null) {
-		const level = success ? 'success' : 'warn';
-		const message = `${event} - User: ${username} - ${success ? 'SUCCESS' : 'FAILED'}`;
-		this.log(level, 'Auth', message, details);
+// Ensure logs directory exists
+function ensureLogsDirectory() {
+	if (!fs.existsSync(CONFIG.logsDir)) {
+		fs.mkdirSync(CONFIG.logsDir, { recursive: true });
 	}
 }
 
-// Export singleton instance
-export const logger = new ServerLogger();
-export default logger;
+// Get current log file path
+function getCurrentLogFile() {
+	const date = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+	return path.join(CONFIG.logsDir, `server-${date}.log`);
+}
+
+// Get log file size
+function getFileSize(filePath) {
+	try {
+		const stats = fs.statSync(filePath);
+		return stats.size;
+	} catch (error) {
+		return 0;
+	}
+}
+
+// Get log file age
+function getFileAge(filePath) {
+	try {
+		const stats = fs.statSync(filePath);
+		return Date.now() - stats.mtime.getTime();
+	} catch (error) {
+		return 0;
+	}
+}
+
+// Rotate log file if needed
+function rotateLogFile(filePath) {
+	const size = getFileSize(filePath);
+	if (size >= CONFIG.maxFileSize) {
+		const timestamp = new Date().toISOString().replace(/:/g, '-').replace(/\./g, '-');
+		const ext = path.extname(filePath);
+		const base = path.basename(filePath, ext);
+		const newPath = path.join(CONFIG.logsDir, `${base}-${timestamp}${ext}`);
+		
+		try {
+			fs.renameSync(filePath, newPath);
+			return true;
+		} catch (error) {
+			console.error('Failed to rotate log file:', error);
+			return false;
+		}
+	}
+	return false;
+}
+
+// Clean old log files
+function cleanOldLogs() {
+	try {
+		const files = fs.readdirSync(CONFIG.logsDir);
+		const logFiles = files
+			.filter(file => file.endsWith('.log'))
+			.map(file => ({
+				name: file,
+				path: path.join(CONFIG.logsDir, file),
+				age: getFileAge(path.join(CONFIG.logsDir, file)),
+				mtime: fs.statSync(path.join(CONFIG.logsDir, file)).mtime.getTime(),
+			}))
+			.sort((a, b) => b.mtime - a.mtime); // Sort by modification time (newest first)
+
+		// Delete files older than maxAge
+		logFiles.forEach(file => {
+			if (file.age > CONFIG.maxAge) {
+				try {
+					fs.unlinkSync(file.path);
+					console.log(`🗑️  Deleted old log file: ${file.name}`);
+				} catch (error) {
+					console.error(`Failed to delete old log file ${file.name}:`, error);
+				}
+			}
+		});
+
+		// Keep only maxFiles newest files
+		if (logFiles.length > CONFIG.maxFiles) {
+			const filesToDelete = logFiles.slice(CONFIG.maxFiles);
+			filesToDelete.forEach(file => {
+				try {
+					fs.unlinkSync(file.path);
+					console.log(`🗑️  Deleted excess log file: ${file.name} (max ${CONFIG.maxFiles} files)`);
+				} catch (error) {
+					console.error(`Failed to delete excess log file ${file.name}:`, error);
+				}
+			});
+		}
+	} catch (error) {
+		console.error('Failed to clean old logs:', error);
+	}
+}
+
+// Write to log file
+function writeToFile(message) {
+	try {
+		ensureLogsDirectory();
+		const logFile = getCurrentLogFile();
+		
+		// Rotate if needed
+		rotateLogFile(logFile);
+		
+		// Append to file with UTF-8 encoding
+		fs.appendFileSync(logFile, message + '\n', { encoding: CONFIG.encoding });
+		
+		// Clean old logs periodically (every write is too frequent, so we do it randomly)
+		if (Math.random() < 0.01) { // 1% chance per write
+			cleanOldLogs();
+		}
+	} catch (error) {
+		console.error('Failed to write to log file:', error);
+	}
+}
+
+// Format timestamp
+function formatTimestamp() {
+	const now = new Date();
+	return now.toISOString();
+}
+
+// Main log function
+function log(level, source, message, data = null) {
+	const levelInfo = LOG_LEVELS[level];
+	if (!levelInfo) return;
+
+	const currentLevel = LOG_LEVELS[currentLogLevel];
+	if (levelInfo.priority < currentLevel.priority) return;
+
+	const timestamp = formatTimestamp();
+	const icon = levelInfo.icon;
+	const color = levelInfo.color;
+
+	// Console output (with colors)
+	const consoleMessage = `${color}${icon} [${timestamp}] [${level.toUpperCase()}] [${source}]${RESET} ${message}`;
+	console.log(consoleMessage);
+	if (data) {
+		console.log(`${color}${JSON.stringify(data, null, 2)}${RESET}`);
+	}
+
+	// File output (without ANSI colors)
+	const fileMessage = `${icon} [${timestamp}] [${level.toUpperCase()}] [${source}] ${message}`;
+	writeToFile(fileMessage);
+	if (data) {
+		writeToFile(JSON.stringify(data, null, 2));
+	}
+}
+
+// Convenience methods
+const logger = {
+	debug: (source, message, data) => log('debug', source, message, data),
+	info: (source, message, data) => log('info', source, message, data),
+	success: (source, message, data) => log('success', source, message, data),
+	warn: (source, message, data) => log('warn', source, message, data),
+	error: (source, message, data) => log('error', source, message, data),
+	fatal: (source, message, data) => log('fatal', source, message, data),
+
+	// Specialized loggers
+	http: (method, path, status, duration) => {
+		const level = status >= 500 ? 'error' : status >= 400 ? 'warn' : 'success';
+		log(level, 'HTTP', `${method} ${path} ${status} - ${duration}ms`);
+	},
+
+	api: (method, endpoint, status, duration) => {
+		const level = status >= 500 ? 'error' : status >= 400 ? 'warn' : 'success';
+		log(level, 'API', `${method} ${endpoint} → ${status} (${duration}ms)`);
+	},
+
+	auth: (action, message, data) => {
+		const level = message.toLowerCase().includes('fail') ? 'error' : 'success';
+		log(level, 'Auth', `${action}: ${message}`, data);
+	},
+
+	// Get configuration
+	getConfig: () => ({ ...CONFIG }),
+
+	// Manual cleanup trigger
+	cleanup: () => {
+		cleanOldLogs();
+	},
+};
+
+// Initialize: ensure directory exists and clean old logs on startup
+ensureLogsDirectory();
+cleanOldLogs();
+
+export { logger };
