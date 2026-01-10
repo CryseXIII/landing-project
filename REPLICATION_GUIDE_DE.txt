@@ -1,0 +1,736 @@
+# Landing Project - Vollständige Replikationsanleitung für Kommilitonen
+
+Diese Anleitung ermöglicht es dir, das komplette Landing Project auf deinem eigenen Computer zu replizieren. Am Ende hast du eine identische Entwicklungsumgebung mit deinen eigenen GitHub-Credentials und lokalem Verzeichnis.
+
+---
+
+## 📋 Voraussetzungen
+
+Bevor du beginnst, benötigst du:
+- ✅ Einen Windows-Computer (Anleitung ist für Windows PowerShell)
+- ✅ Administratorrechte für Softwareinstallationen
+- ✅ Einen GitHub-Account (kostenlos auf https://github.com/signup)
+- ✅ Internetzugang für Downloads
+
+---
+
+## 🎯 Was du am Ende haben wirst
+
+Nach dieser Anleitung hast du:
+- ✅ Ein vollständiges React + Express Fullstack-Projekt
+- ✅ JWT-Authentifizierung mit Login-Funktionalität
+- ✅ Umfassendes Logging-System mit Icons und Farben
+- ✅ Automatische Umgebungserkennung (Windows/Mac/Linux)
+- ✅ Dein eigenes GitHub-Repository (öffentlich sichtbar auf deinem Profil)
+- ✅ Git-Versionskontrolle mit Semantic Versioning
+- ✅ Entwicklungsserver auf localhost:5173 (Frontend) und localhost:5000 (Backend)
+
+---
+
+## ⚙️ Schritt 1: Benutzerdefinierte Konfiguration
+
+**WICHTIG:** Bevor du mit der Installation beginnst, notiere dir folgende Informationen:
+
+### 1.1 Deine GitHub-Credentials
+```
+GitHub Username: _______________________
+GitHub Email: _______________________
+```
+
+### 1.2 Dein lokales Arbeitsverzeichnis
+Wähle ein Verzeichnis, in dem alle deine Projekte gespeichert werden.
+
+**Empfohlen:**
+```
+C:\Users\[DeinWindowsUsername]\Desktop\VSCode
+```
+
+**Oder eigener Pfad:**
+```
+_______________________
+```
+
+### 1.3 Dein Projekt-Name
+Wähle einen Namen für dein Projekt (Klein- und Großbuchstaben, Bindestriche erlaubt).
+
+**Beispiel:** `landing-project` oder `mein-react-projekt`
+
+```
+Dein Projektname: _______________________
+```
+
+---
+
+## 📥 Schritt 2: Software-Installation
+
+Öffne PowerShell als Administrator (Rechtsklick auf Start-Button → "Windows PowerShell (Administrator)").
+
+### 2.1 Execution Policy setzen (nur einmal nötig)
+```powershell
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
+```
+
+### 2.2 Node.js installieren (JavaScript-Runtime)
+```powershell
+winget install --id OpenJS.NodeJS.LTS --silent --accept-package-agreements --accept-source-agreements
+```
+
+**Was wird installiert:** Node.js v24.12.0 LTS + npm 11.7.0
+
+### 2.3 Python installieren (für mögliche Backend-Erweiterungen)
+```powershell
+winget install --id Python.Python.3.13 --silent --accept-package-agreements --accept-source-agreements
+```
+
+**Was wird installiert:** Python 3.13.11 LTS
+
+### 2.4 Git installieren (Versionskontrolle)
+```powershell
+winget install --id Git.Git --silent --accept-package-agreements --accept-source-agreements
+```
+
+**Was wird installiert:** Git 2.52.0
+
+### 2.5 GitHub CLI installieren (GitHub-Integration)
+```powershell
+winget install --id GitHub.cli --silent --accept-package-agreements --accept-source-agreements
+```
+
+**Was wird installiert:** GitHub CLI v2.83.2
+
+### 2.6 PATH-Variable aktualisieren
+```powershell
+$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+```
+
+### 2.7 Installation verifizieren
+```powershell
+node --version   # Sollte v24.12.0 anzeigen
+npm --version    # Sollte 11.7.0 anzeigen
+python --version # Sollte Python 3.13.11 anzeigen
+git --version    # Sollte git version 2.52.0 anzeigen
+gh --version     # Sollte gh version 2.83.2 anzeigen
+```
+
+---
+
+## 📁 Schritt 3: Projektverzeichnis vorbereiten
+
+### 3.1 Arbeitsverzeichnis erstellen
+Ersetze `[DeinArbeitsverzeichnis]` mit deinem gewählten Pfad aus Schritt 1.2:
+
+```powershell
+mkdir [DeinArbeitsverzeichnis]
+cd [DeinArbeitsverzeichnis]
+```
+
+**Beispiel:**
+```powershell
+mkdir C:\Users\Max\Desktop\VSCode
+cd C:\Users\Max\Desktop\VSCode
+```
+
+### 3.2 Copilot-Instructions-Ordner erstellen
+```powershell
+mkdir .github
+```
+
+---
+
+## 🚀 Schritt 4: React-Projekt mit Vite erstellen
+
+### 4.1 Projektordner erstellen und Vite initialisieren
+Ersetze `[DeinProjektname]` mit deinem gewählten Namen aus Schritt 1.3:
+
+```powershell
+npm create vite@latest [DeinProjektname] -- --template react
+cd [DeinProjektname]
+```
+
+**Beispiel:**
+```powershell
+npm create vite@latest landing-project -- --template react
+cd landing-project
+```
+
+### 4.2 Abhängigkeiten installieren
+```powershell
+npm install
+```
+
+### 4.3 Zusätzliche Pakete installieren
+```powershell
+npm install react-router-dom express cors jsonwebtoken cookie-parser dotenv concurrently
+```
+
+---
+
+## 🔧 Schritt 5: Git-Repository initialisieren
+
+### 5.1 Git initialisieren
+```powershell
+git init
+```
+
+### 5.2 Git-Benutzer konfigurieren
+Ersetze die Platzhalter mit deinen Daten aus Schritt 1.1:
+
+```powershell
+git config user.name "[DeinGitHubUsername]"
+git config user.email "[DeineGitHubEmail]"
+```
+
+**Beispiel:**
+```powershell
+git config user.name "MaxMustermann"
+git config user.email "max.mustermann@example.com"
+```
+
+---
+
+## 🐙 Schritt 6: GitHub-Repository erstellen
+
+### 6.1 GitHub CLI authentifizieren
+```powershell
+gh auth login
+```
+
+**Folge den Anweisungen:**
+1. Wähle: `GitHub.com`
+2. Wähle: `HTTPS`
+3. Wähle: `Yes` (Git mit GitHub-Credentials authentifizieren)
+4. Wähle: `Login with a web browser`
+5. Kopiere den angezeigten Code
+6. Drücke Enter → Browser öffnet sich
+7. Füge den Code ein und autorisiere
+
+### 6.2 GitHub-Repository erstellen
+Ersetze `[DeinProjektname]` mit deinem Projektnamen:
+
+```powershell
+gh repo create [DeinProjektname] --public --source=. --remote=origin --description "Fullstack React App mit Express Backend und JWT Auth"
+```
+
+**Beispiel:**
+```powershell
+gh repo create landing-project --public --source=. --remote=origin --description "Fullstack React App mit Express Backend und JWT Auth"
+```
+
+**Was passiert:**
+- ✅ GitHub-Repository wird erstellt
+- ✅ Remote-Verbindung wird hergestellt
+- ✅ Repository ist auf deinem GitHub-Profil sichtbar
+
+---
+
+## 📦 Schritt 7: Projektstruktur erstellen
+
+### 7.1 Server-Ordner erstellen
+```powershell
+mkdir server\config, server\middleware, server\models, server\routes, server\utils
+```
+
+### 7.2 Client-Ordner erstellen
+```powershell
+mkdir src\components, src\pages, src\services, src\styles, src\utils
+```
+
+---
+
+## 📄 Schritt 8: Projektdateien erstellen
+
+### 8.1 Environment-Dateien erstellen
+
+**Erstelle `.env.development` (Windows):**
+```powershell
+@"
+NODE_ENV=development
+OS_ENV=windows
+PORT=5000
+VITE_API_BASE_URL=http://localhost:5000
+VITE_CLIENT_PORT=5173
+LOG_LEVEL_SERVER=debug
+VITE_LOG_LEVEL_CLIENT=debug
+ENABLE_SOURCE_MAPS=true
+ENABLE_DEBUG_PANEL=true
+JWT_SECRET=dein-super-geheimer-jwt-secret-schlüssel-hier
+JWT_EXPIRES_IN=24h
+DEV_USER_USERNAME=developer
+DEV_USER_PASSWORD=dev123
+"@ | Out-File -FilePath .env.development -Encoding UTF8
+```
+
+**Erstelle `.env.testing` (Mac):**
+```powershell
+@"
+NODE_ENV=testing
+OS_ENV=mac
+PORT=5001
+VITE_API_BASE_URL=http://localhost:5001
+VITE_CLIENT_PORT=5174
+LOG_LEVEL_SERVER=debug
+VITE_LOG_LEVEL_CLIENT=debug
+ENABLE_SOURCE_MAPS=true
+ENABLE_DEBUG_PANEL=true
+JWT_SECRET=dein-super-geheimer-jwt-secret-schlüssel-hier
+JWT_EXPIRES_IN=24h
+DEV_USER_USERNAME=developer
+DEV_USER_PASSWORD=dev123
+"@ | Out-File -FilePath .env.testing -Encoding UTF8
+```
+
+**Erstelle `.env.production` (Linux):**
+```powershell
+@"
+NODE_ENV=production
+OS_ENV=linux
+PORT=8080
+VITE_API_BASE_URL=http://localhost:8080
+VITE_CLIENT_PORT=8080
+LOG_LEVEL_SERVER=error
+VITE_LOG_LEVEL_CLIENT=error
+ENABLE_SOURCE_MAPS=false
+ENABLE_DEBUG_PANEL=false
+JWT_SECRET=dein-super-geheimer-jwt-secret-schlüssel-hier
+JWT_EXPIRES_IN=24h
+"@ | Out-File -FilePath .env.production -Encoding UTF8
+```
+
+**Erstelle `.env.example` (Template):**
+```powershell
+@"
+NODE_ENV=development
+OS_ENV=windows
+PORT=5000
+VITE_API_BASE_URL=http://localhost:5000
+VITE_CLIENT_PORT=5173
+LOG_LEVEL_SERVER=debug
+VITE_LOG_LEVEL_CLIENT=debug
+ENABLE_SOURCE_MAPS=true
+ENABLE_DEBUG_PANEL=true
+JWT_SECRET=your-secret-key-here
+JWT_EXPIRES_IN=24h
+DEV_USER_USERNAME=developer
+DEV_USER_PASSWORD=dev123
+"@ | Out-File -FilePath .env.example -Encoding UTF8
+```
+
+**Erstelle `.env` (Aktuelle Umgebung):**
+```powershell
+Copy-Item .env.development .env
+```
+
+### 8.2 .gitignore aktualisieren
+```powershell
+@"
+# Dependencies
+node_modules
+/.pnp
+.pnp.js
+
+# Testing
+/coverage
+
+# Production
+/build
+/dist
+
+# Environment
+.env
+.env.local
+
+# Misc
+.DS_Store
+*.log
+npm-debug.log*
+
+# IDE
+.vscode
+.idea
+"@ | Out-File -FilePath .gitignore -Encoding UTF8
+```
+
+### 8.3 package.json Scripts aktualisieren
+
+Öffne `package.json` und füge folgende Scripts hinzu:
+
+```json
+"scripts": {
+	"dev": "vite",
+	"dev:server": "node server/index.js",
+	"dev:all": "concurrently \"npm run dev\" \"npm run dev:server\"",
+	"build": "vite build",
+	"lint": "eslint .",
+	"preview": "vite preview"
+}
+```
+
+Setze außerdem die Version auf:
+```json
+"version": "0.1.0"
+```
+
+---
+
+## 🎨 Schritt 9: Theme-Datei erstellen
+
+**Erstelle `src/styles/theme.css`:**
+
+Diese Datei enthält alle CSS-Variablen für das Dark Theme. Kopiere folgenden Inhalt:
+
+```css
+:root {
+	/* Colors */
+	--bg-primary: #0a0e27;
+	--bg-secondary: #141937;
+	--text-primary: #e8eaf0;
+	--text-secondary: #b8bbc8;
+	--text-tertiary: #6e7191;
+	--accent-primary: #667eea;
+	--accent-secondary: #764ba2;
+	--border-color: rgba(255, 255, 255, 0.1);
+
+	/* Spacing */
+	--spacing-xs: 4px;
+	--spacing-sm: 8px;
+	--spacing-md: 16px;
+	--spacing-lg: 24px;
+	--spacing-xl: 32px;
+	--spacing-2xl: 48px;
+
+	/* Font Sizes */
+	--font-xs: 12px;
+	--font-sm: 14px;
+	--font-md: 16px;
+	--font-lg: 18px;
+	--font-xl: 24px;
+	--font-2xl: 32px;
+	--font-3xl: 48px;
+
+	/* Radius */
+	--radius-sm: 4px;
+	--radius-md: 8px;
+	--radius-lg: 16px;
+	--radius-xl: 24px;
+
+	/* Shadows */
+	--shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+	--shadow-md: 0 4px 6px rgba(0, 0, 0, 0.3);
+	--shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.4);
+
+	/* Breakpoints */
+	--breakpoint-mobile: 480px;
+	--breakpoint-tablet: 768px;
+	--breakpoint-desktop: 1024px;
+}
+
+* {
+	box-sizing: border-box;
+}
+
+body {
+	margin: 0;
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+		'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+		sans-serif;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	background: var(--bg-primary);
+	color: var(--text-primary);
+}
+```
+
+---
+
+## 🛠️ Schritt 10: Projekt-Code von GitHub klonen
+
+**WICHTIG:** Anstatt alle Dateien manuell zu erstellen, kannst du den kompletten Code von GitHub klonen:
+
+### Option A: Mein Repository als Template verwenden
+
+```powershell
+# Gehe zurück ins Hauptverzeichnis
+cd ..
+
+# Klone das vollständige Repository
+git clone https://github.com/CryseXIII/landing-project.git dein-projekt-name
+
+# Wechsle ins Verzeichnis
+cd dein-projekt-name
+
+# Installiere Abhängigkeiten
+npm install
+
+# Entferne die alte Remote-Verbindung
+git remote remove origin
+
+# Erstelle dein eigenes GitHub-Repository
+gh repo create dein-projekt-name --public --source=. --remote=origin
+
+# Pushe zum eigenen Repository
+git push -u origin master
+```
+
+### Option B: Manuelle Dateierstellung fortsetzen
+
+Falls du alle Dateien selbst erstellen möchtest, gehe zu **Anhang A** am Ende dieser Anleitung.
+
+---
+
+## 🚀 Schritt 11: Projekt starten
+
+### 11.1 Beide Server starten (Frontend + Backend gleichzeitig)
+```powershell
+npm run dev:all
+```
+
+**Was startet:**
+- ✅ Vite Dev Server (Frontend): http://localhost:5173
+- ✅ Express Server (Backend): http://localhost:5000
+
+### 11.2 Nur Frontend starten
+```powershell
+npm run dev
+```
+
+### 11.3 Nur Backend starten
+```powershell
+npm run dev:server
+```
+
+---
+
+## 🧪 Schritt 12: Funktionalität testen
+
+### 12.1 Browser öffnen
+Öffne http://localhost:5173 in deinem Browser.
+
+### 12.2 Login testen
+1. Klicke auf "Login →"
+2. Verwende Credentials:
+   - Username: `developer`
+   - Password: `dev123`
+3. Nach Login solltest du deinen Username oben rechts sehen
+4. Logout-Button sollte erscheinen
+
+### 12.3 API testen
+1. Gehe zu "Go to Hello World →"
+2. Gebe eine Zahl ein (z.B. 5)
+3. Klicke "Increment +1"
+4. Ergebnis sollte 6 anzeigen
+
+### 12.4 Logging überprüfen
+**Im Browser (F12 → Console):**
+- Solltest du farbige Logs mit Icons sehen
+- Jeder Log hat Zeitstempel und Quelle
+
+**Im Terminal (wo npm läuft):**
+- Solltest du farbige Server-Logs sehen
+- HTTP-Requests werden geloggt
+
+---
+
+## 📝 Schritt 13: Erster Commit
+
+### 13.1 Änderungen stagen
+```powershell
+git add .
+```
+
+### 13.2 Commit erstellen
+```powershell
+git commit -m "chore: initial project setup with full authentication and logging"
+```
+
+### 13.3 Zum GitHub pushen
+```powershell
+git push -u origin master
+```
+
+**Prüfe dein GitHub-Profil:** Dein Repository sollte jetzt online sichtbar sein!
+
+---
+
+## 🎓 Schritt 14: Conventional Commits lernen
+
+Alle zukünftigen Commits sollten diesem Format folgen:
+
+```
+<type>(<scope>): <description>
+```
+
+**Typen:**
+- `feat`: Neue Funktion → Version Y erhöhen
+- `fix`: Bugfix → Version Z erhöhen
+- `chore`: Wartung → Version Z erhöhen
+- `docs`: Dokumentation → Version Z erhöhen
+- `style`: Code-Formatierung → Version Z erhöhen
+- `refactor`: Code-Umstrukturierung → Version Z erhöhen
+
+**Beispiele:**
+```bash
+git commit -m "feat(auth): add password reset functionality"
+git commit -m "fix(api): correct increment endpoint validation"
+git commit -m "docs(readme): update installation instructions"
+```
+
+### Versioning bei jedem Commit:
+
+1. **Öffne `package.json`**
+2. **Aktualisiere Version basierend auf Change-Type:**
+   - Major Feature: `0.1.0` → `1.0.0`
+   - New Feature: `0.1.0` → `0.2.0`
+   - Bugfix: `0.1.0` → `0.1.1`
+3. **Commit mit Versionsnummer**
+
+---
+
+## 📚 Nächste Schritte
+
+### Projekt erweitern:
+1. **Neue Komponenten erstellen** in `src/components/`
+2. **Neue Seiten hinzufügen** in `src/pages/`
+3. **API-Endpunkte erweitern** in `server/routes/`
+4. **Datenbank integrieren** (MongoDB, PostgreSQL, etc.)
+5. **Eigene Funktionen implementieren**
+
+### Git-Workflow beibehalten:
+```bash
+# Feature-Branch erstellen
+git checkout -b feat/meine-neue-funktion
+
+# Änderungen machen und committen
+git add .
+git commit -m "feat: meine neue funktion"
+
+# Zurück zu master und mergen
+git checkout master
+git merge feat/meine-neue-funktion
+
+# Zum GitHub pushen
+git push origin master
+```
+
+---
+
+## 🆘 Troubleshooting
+
+### Problem: "winget" wird nicht erkannt
+**Lösung:** Windows 10 Version 1809+ oder Windows 11 erforderlich. Update Windows oder installiere App Installer aus dem Microsoft Store.
+
+### Problem: "npm" wird nicht erkannt nach Installation
+**Lösung:** 
+```powershell
+$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+```
+
+### Problem: Port 5173 oder 5000 bereits belegt
+**Lösung:** Ändere Ports in `.env.development`:
+```
+PORT=5001
+VITE_CLIENT_PORT=5174
+```
+
+### Problem: Git-Push schlägt fehl
+**Lösung:** Stelle sicher, dass du authentifiziert bist:
+```powershell
+gh auth status
+gh auth login
+```
+
+### Problem: Server startet nicht
+**Lösung:** Prüfe, ob alle Dateien erstellt wurden:
+```powershell
+dir server\
+dir server\config\
+dir server\utils\
+```
+
+---
+
+## ✅ Checkliste: Habe ich alles?
+
+- [ ] Node.js installiert (`node --version`)
+- [ ] npm installiert (`npm --version`)
+- [ ] Git installiert (`git --version`)
+- [ ] GitHub CLI installiert (`gh --version`)
+- [ ] GitHub authentifiziert (`gh auth status`)
+- [ ] Projektverzeichnis erstellt
+- [ ] Vite-Projekt initialisiert
+- [ ] Alle npm-Pakete installiert
+- [ ] Git-Repository initialisiert
+- [ ] GitHub-Repository erstellt
+- [ ] Environment-Dateien erstellt
+- [ ] Theme-Datei erstellt
+- [ ] Alle Projektdateien erstellt (oder geklont)
+- [ ] Server startet ohne Fehler
+- [ ] Frontend lädt im Browser
+- [ ] Login funktioniert
+- [ ] API-Calls funktionieren
+- [ ] Logging sichtbar (Browser + Terminal)
+- [ ] Erster Commit gepusht
+- [ ] Repository auf GitHub sichtbar
+
+---
+
+## 🎉 Herzlichen Glückwunsch!
+
+Du hast erfolgreich das vollständige Landing Project repliziert! Du hast jetzt:
+
+✅ Ein professionelles Fullstack-Projekt
+✅ React 19 + Express Backend
+✅ JWT-Authentifizierung
+✅ Umfassendes Logging-System
+✅ Dein eigenes GitHub-Repository
+✅ Semantic Versioning Setup
+✅ Vollständige Entwicklungsumgebung
+
+**Dein Repository:** `https://github.com/[DeinUsername]/[DeinProjektname]`
+
+---
+
+## 📖 Anhang A: Vollständige Dateiliste (Falls manuelle Erstellung gewünscht)
+
+Falls du Option B gewählt hast und alle Dateien manuell erstellen möchtest, findest du hier die komplette Liste aller benötigten Dateien mit Inhalten:
+
+### Server-Dateien:
+
+1. `server/config/env-loader.js` - [Siehe GitHub]
+2. `server/utils/logger.js` - [Siehe GitHub]
+3. `server/middleware/auth.js` - [Siehe GitHub]
+4. `server/models/api.models.js` - [Siehe GitHub]
+5. `server/routes/auth.js` - [Siehe GitHub]
+6. `server/routes/api.js` - [Siehe GitHub]
+7. `server/index.js` - [Siehe GitHub]
+
+### Client-Dateien:
+
+1. `src/utils/logger.js` - [Siehe GitHub]
+2. `src/services/api.js` - [Siehe GitHub]
+3. `src/components/Button.jsx` & `.css` - [Siehe GitHub]
+4. `src/components/Login.jsx` & `.css` - [Siehe GitHub]
+5. `src/pages/HelloWorld.jsx` & `.css` - [Siehe GitHub]
+6. `src/pages/ApiDocs.jsx` & `.css` - [Siehe GitHub]
+7. `src/pages/Documentation.jsx` & `.css` - [Siehe GitHub]
+8. `src/App.jsx` & `.css` - [Siehe GitHub]
+9. `src/main.jsx` - [Siehe GitHub]
+
+**Empfehlung:** Verwende Option A (Repository klonen) für schnellere Replikation!
+
+---
+
+## 📞 Kontakt & Support
+
+Falls du Fragen hast oder Hilfe benötigst:
+
+1. **GitHub Issues:** Öffne ein Issue im Original-Repository
+2. **Dokumentation:** Besuche `/documentation` Route im laufenden Projekt
+3. **API-Docs:** Besuche `/api-docs` Route im laufenden Projekt
+
+---
+
+**Erstellt von:** CryseXIII
+**Repository:** https://github.com/CryseXIII/landing-project
+**Lizenz:** MIT
+
+**Viel Erfolg beim Replizieren! 🚀**

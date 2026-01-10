@@ -80,6 +80,7 @@ function App() {
 				{!user && <Button text="Login →" to="/login" />}
 				<Button text="Go to Hello World →" to="/hello" />
 				<Button text="API Documentation →" to="/api-docs" />
+				<Button text="📚 Dokumentation (DE) →" to="/documentation" />
 			</div>
 			<p className="read-the-docs">
 				Click on the Vite and React logos to learn more
