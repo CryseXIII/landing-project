@@ -1,0 +1,764 @@
+═══════════════════════════════════════════════════════════════════════════════
+  LANDING PROJECT - KOMPLETTE INSTALLATIONS- & REPLIKATIONSANLEITUNG
+  Version 0.4.0 | Erstellt: Januar 2026
+═══════════════════════════════════════════════════════════════════════════════
+
+Diese Anleitung ermöglicht dir, das komplette Landing Project auf deinem 
+eigenen Computer zu replizieren - inklusive React Frontend, Express Backend, 
+JWT-Authentifizierung, dateibasiertem Logging und Live Log Viewer.
+
+═══════════════════════════════════════════════════════════════════════════════
+  TEIL 1: VORAUSSETZUNGEN INSTALLIEREN
+═══════════════════════════════════════════════════════════════════════════════
+
+1.1 NODE.JS & NPM INSTALLIEREN
+───────────────────────────────────────────────────────────────────────────────
+Windows (mit winget):
+  > winget install --id OpenJS.NodeJS.LTS --silent --accept-package-agreements --accept-source-agreements
+  > $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+  > node --version        # Sollte v24.12.0 oder höher anzeigen
+  > npm --version         # Sollte 11.7.0 oder höher anzeigen
+
+Mac:
+  > brew install node@24
+  > node --version
+  > npm --version
+
+Linux:
+  > curl -fsSL https://deb.nodesource.com/setup_24.x | sudo -E bash -
+  > sudo apt-get install -y nodejs
+  > node --version
+  > npm --version
+
+1.2 GIT INSTALLIEREN (falls noch nicht vorhanden)
+───────────────────────────────────────────────────────────────────────────────
+Windows:
+  > winget install --id Git.Git --silent --accept-package-agreements --accept-source-agreements
+  > $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+  > git --version
+
+Mac:
+  > brew install git
+  > git --version
+
+Linux:
+  > sudo apt-get install git
+  > git --version
+
+1.3 GITHUB CLI INSTALLIEREN (optional, aber empfohlen)
+───────────────────────────────────────────────────────────────────────────────
+Windows:
+  > winget install --id GitHub.cli --silent --accept-package-agreements --accept-source-agreements
+  > $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+  > gh auth login       # GitHub-Konto verbinden
+
+Mac:
+  > brew install gh
+  > gh auth login
+
+Linux:
+  > sudo apt install gh
+  > gh auth login
+
+═══════════════════════════════════════════════════════════════════════════════
+  TEIL 2: PROJEKT KLONEN ODER ERSTELLEN
+═══════════════════════════════════════════════════════════════════════════════
+
+OPTION A: Projekt von GitHub klonen (empfohlen)
+───────────────────────────────────────────────────────────────────────────────
+> cd C:\Users\DEIN_USERNAME\Desktop
+> git clone https://github.com/CryseXIII/landing-project.git
+> cd landing-project
+> npm install    # Alle Abhängigkeiten installieren
+
+OPTION B: Komplett neu erstellen (Lernzweck)
+───────────────────────────────────────────────────────────────────────────────
+Siehe TEIL 6 für die komplette Schritt-für-Schritt-Anleitung.
+
+═══════════════════════════════════════════════════════════════════════════════
+  TEIL 3: GIT KONFIGURIEREN
+═══════════════════════════════════════════════════════════════════════════════
+
+3.1 GIT-BENUTZER EINRICHTEN (pro Projekt)
+───────────────────────────────────────────────────────────────────────────────
+> cd landing-project
+> git config user.name "DEIN_GITHUB_USERNAME"
+> git config user.email "DEINE_EMAIL@beispiel.com"
+
+3.2 REMOTE REPOSITORY VERBINDEN (falls selbst erstellt)
+───────────────────────────────────────────────────────────────────────────────
+> gh repo create landing-project --public --source=. --remote=origin
+ODER manuell:
+> git remote add origin https://github.com/DEIN_USERNAME/landing-project.git
+
+═══════════════════════════════════════════════════════════════════════════════
+  TEIL 4: PROJEKT STARTEN
+═══════════════════════════════════════════════════════════════════════════════
+
+4.1 ENTWICKLUNGSSERVER STARTEN
+───────────────────────────────────────────────────────────────────────────────
+> cd landing-project
+> npm run dev:all
+
+Das startet automatisch:
+  - Frontend (Vite): http://localhost:5173
+  - Backend (Express): http://localhost:5000
+
+4.2 BROWSER ÖFFNEN
+───────────────────────────────────────────────────────────────────────────────
+Öffne deinen Browser und navigiere zu:
+  http://localhost:5173
+
+Du solltest die Landing Page mit folgenden Buttons sehen:
+  - Login → (Anmelden)
+  - Go to Hello World → (API testen)
+  - API Documentation → (API-Docs anzeigen)
+  - 📚 Dokumentation (DE) → (Deutsche Dokumentation)
+  - 📜 Log Viewer → (Logs in Echtzeit anzeigen)
+
+4.3 LOGIN TESTEN
+───────────────────────────────────────────────────────────────────────────────
+1. Klicke auf "Login →"
+2. Gib folgende Credentials ein:
+   Username: developer
+   Password: dev123
+3. Klicke "Login"
+4. Du wirst zur Hauptseite zurückgeleitet und siehst oben rechts: "👤 developer"
+
+4.4 API TESTEN
+───────────────────────────────────────────────────────────────────────────────
+1. Klicke auf "Go to Hello World →"
+2. Gib eine Zahl ein (z.B. 42)
+3. Klicke "Increment"
+4. Du solltest sehen: "Result: 43"
+
+4.5 LOGS ANZEIGEN
+───────────────────────────────────────────────────────────────────────────────
+1. Klicke auf "📜 Log Viewer →"
+2. Links siehst du alle Server- und Client-Log-Dateien
+3. Klicke auf eine Datei, um den Inhalt anzuzeigen
+4. Aktiviere "Auto-Refresh" für Live-Updates
+5. Aktiviere "Auto-Scroll" um automatisch nach unten zu scrollen
+
+═══════════════════════════════════════════════════════════════════════════════
+  TEIL 5: PROJEKT-FEATURES VERSTEHEN
+═══════════════════════════════════════════════════════════════════════════════
+
+5.1 PROJEKTSTRUKTUR
+───────────────────────────────────────────────────────────────────────────────
+landing-project/
+├── src/                          # Frontend (React)
+│   ├── components/               # UI-Komponenten
+│   │   ├── Button.jsx           # Navigations-Button
+│   │   └── Login.jsx            # Login-Formular
+│   ├── pages/                    # Seiten (Routen)
+│   │   ├── HelloWorld.jsx       # API-Test Seite
+│   │   ├── ApiDocs.jsx          # API-Dokumentation
+│   │   ├── Documentation.jsx    # Deutsche Doku
+│   │   └── LogViewer.jsx        # Log Viewer Tool
+│   ├── services/                 # API-Services
+│   │   └── api.js               # API-Wrapper
+│   ├── styles/                   # Styles
+│   │   └── theme.css            # CSS-Variablen (Dark Theme)
+│   └── utils/                    # Client-Utilities
+│       └── logger.js            # Client-Logger
+├── server/                       # Backend (Express)
+│   ├── config/                   # Konfiguration
+│   │   └── env-loader.js        # Umgebungserkennung
+│   ├── middleware/               # Middleware
+│   │   └── auth.js              # JWT-Auth
+│   ├── models/                   # Datenmodelle
+│   │   └── api.models.js        # Request/Response-Modelle
+│   ├── routes/                   # API-Routen
+│   │   ├── auth.js              # Login/Logout/Me
+│   │   ├── api.js               # API-Endpunkte
+│   │   └── logs.js              # Log-Management
+│   └── utils/                    # Server-Utilities
+│       └── logger.js            # Server-Logger
+├── logs/                         # Log-Dateien (auto-generiert)
+│   ├── server/                   # Server-Logs
+│   │   └── server-2026-01-10.log
+│   └── client/                   # Client-Logs
+│       └── client-2026-01-10.log
+├── .env.development              # Windows-Entwicklung
+├── .env.testing                  # Mac-Testing
+├── .env.production               # Linux-Produktion
+└── package.json                  # Dependencies & Scripts
+
+5.2 WICHTIGE DATEIEN & IHRE FUNKTION
+───────────────────────────────────────────────────────────────────────────────
+📄 package.json
+  - Enthält alle npm-Abhängigkeiten
+  - Definiert Scripts: dev, dev:server, dev:all, build, preview
+  - Aktuelle Version: 0.4.0
+
+📄 vite.config.js
+  - Vite-Konfiguration für Frontend-Build
+  - Proxy-Einstellungen für Backend-API
+
+📄 server/index.js
+  - Haupt-Server-Datei (Express-App)
+  - Startet auf Port 5000 (development)
+
+📄 src/main.jsx
+  - React-Entry-Point
+  - Router-Konfiguration (alle Routen)
+
+📄 src/App.jsx
+  - Haupt-App-Komponente
+  - Auth-Status-Anzeige
+  - Navigation
+
+5.3 UMGEBUNGSVARIABLEN VERSTEHEN
+───────────────────────────────────────────────────────────────────────────────
+Die App erkennt automatisch das Betriebssystem:
+  - Windows → .env.development geladen
+  - Mac → .env.testing geladen
+  - Linux → .env.production geladen
+
+Wichtige Variablen in .env.development:
+
+NODE_ENV=development              # Umgebung
+PORT=5000                         # Server-Port
+VITE_API_BASE_URL=http://localhost:5000   # API-URL für Frontend
+LOG_LEVEL_SERVER=debug            # Server-Log-Level
+VITE_LOG_LEVEL_CLIENT=debug       # Client-Log-Level
+JWT_SECRET=dev_secret_key_change_in_production_12345   # JWT-Secret
+JWT_EXPIRY=24h                    # Token-Gültigkeit
+
+5.4 LOGGING-SYSTEM
+───────────────────────────────────────────────────────────────────────────────
+Das Projekt hat ein umfassendes Logging-System:
+
+LOG-LEVELS:
+  🐛 debug   - Detaillierte Debug-Info
+  ℹ️  info    - Allgemeine Info
+  ✅ success - Erfolgreiche Operationen
+  ⚠️  warn    - Warnungen
+  ❌ error   - Fehler
+  💀 fatal   - Kritische Fehler
+
+CONSOLE-LOGGING:
+  - Server: Terminal mit ANSI-Farben
+  - Client: Browser-Console mit CSS-Styling
+  - Alle Logs haben: Zeitstempel, Level, Quelle, Nachricht
+
+DATEI-LOGGING:
+  - Server-Logs: logs/server/server-YYYY-MM-DD.log
+  - Client-Logs: logs/client/client-YYYY-MM-DD.log
+  - UTF-8 Encoding (Umlaute, Emojis unterstützt)
+  - Max. Dateigröße: 100 MB
+  - Auto-Rotation bei 100 MB (Datei umbenannt mit Zeitstempel)
+  - Auto-Delete: Dateien älter als 30 Tage gelöscht
+  - Max. Anzahl: 10 Dateien (älteste werden gelöscht)
+
+LOG VIEWER:
+  - Echtzeit-Anzeige aller Log-Dateien
+  - Auto-Refresh (1s/2s/5s/10s)
+  - Auto-Scroll zum Ende
+  - Dateigrößen-Anzeige
+  - Letzte Änderungszeit
+
+5.5 AUTHENTIFIZIERUNG
+───────────────────────────────────────────────────────────────────────────────
+JWT (JSON Web Tokens) mit httpOnly Cookies:
+
+LOGIN-FLOW:
+  1. Benutzer gibt Credentials ein (Login-Seite)
+  2. POST /auth/login an Server
+  3. Server prüft Credentials
+  4. JWT-Token wird generiert (enthält username + permissions)
+  5. Token wird als httpOnly Cookie gespeichert (XSS-Schutz)
+  6. Client speichert User-Info im React-State
+  7. Zukünftige API-Requests senden Cookie automatisch mit
+
+BERECHTIGUNGEN:
+  Developer-User hat folgende Permissions:
+    - api.increment (Increment-Funktion nutzen)
+    - api.read (Daten lesen)
+    - api.write (Daten schreiben)
+
+GESCHÜTZTE ROUTEN:
+  - /auth/me (erfordert JWT)
+  - /api/increment (erfordert JWT + Permission "api.increment")
+
+5.6 API-ENDPUNKTE
+───────────────────────────────────────────────────────────────────────────────
+BASE URL: http://localhost:5000
+
+AUTH-ENDPUNKTE:
+  POST /auth/login
+    Body: { "username": "developer", "password": "dev123" }
+    Response: { "user": { "username": "developer", "permissions": [...] } }
+
+  POST /auth/logout
+    Response: { "message": "Logged out successfully" }
+
+  GET /auth/me
+    Auth: ✅ Required
+    Response: { "user": { "username": "developer", "permissions": [...] } }
+
+API-ENDPUNKTE:
+  GET /api/test
+    Auth: ❌ Not required
+    Response: { "message": "API is working!" }
+
+  POST /api/increment
+    Auth: ✅ Required
+    Permission: api.increment
+    Body: { "number": 42 }
+    Response: { "result": 43, "timestamp": "2026-01-10T..." }
+
+LOG-ENDPUNKTE:
+  POST /logs/client
+    Body: { "level": "info", "source": "Component", "message": "...", ... }
+    Response: { "success": true }
+
+  GET /logs/list
+    Response: { "server": [...], "client": [...] }
+
+  GET /logs/read/:type/:filename
+    Response: { "content": "..." }
+
+  GET /logs/tail/:type/:filename?lines=100
+    Response: { "content": "..." }
+
+═══════════════════════════════════════════════════════════════════════════════
+  TEIL 6: PROJEKT VON GRUND AUF NEU ERSTELLEN
+═══════════════════════════════════════════════════════════════════════════════
+
+Falls du das Projekt komplett neu erstellen möchtest (für Lernzwecke):
+
+6.1 VERZEICHNIS ERSTELLEN
+───────────────────────────────────────────────────────────────────────────────
+> mkdir mein-landing-project
+> cd mein-landing-project
+
+6.2 VITE + REACT INITIALISIEREN
+───────────────────────────────────────────────────────────────────────────────
+> npm create vite@latest . -- --template react
+> npm install
+
+6.3 ABHÄNGIGKEITEN INSTALLIEREN
+───────────────────────────────────────────────────────────────────────────────
+> npm install react-router-dom
+> npm install express cors dotenv cookie-parser jsonwebtoken
+> npm install --save-dev concurrently
+
+6.4 VERZEICHNISSTRUKTUR ERSTELLEN
+───────────────────────────────────────────────────────────────────────────────
+> mkdir server
+> mkdir server\config server\middleware server\models server\routes server\utils
+> mkdir src\components src\pages src\services src\styles src\utils
+> mkdir logs logs\server logs\client
+
+6.5 DATEIEN ERSTELLEN
+───────────────────────────────────────────────────────────────────────────────
+Erstelle alle Dateien wie im Original-Projekt (siehe GitHub-Repo).
+
+Wichtigste Dateien:
+  ✅ server/index.js (Express-Server)
+  ✅ server/config/env-loader.js (Umgebungserkennung)
+  ✅ server/middleware/auth.js (JWT-Middleware)
+  ✅ server/routes/auth.js (Login/Logout)
+  ✅ server/routes/api.js (API-Endpunkte)
+  ✅ server/routes/logs.js (Log-Management)
+  ✅ server/utils/logger.js (Server-Logger mit File-Logging)
+  ✅ src/utils/logger.js (Client-Logger)
+  ✅ src/services/api.js (API-Service-Layer)
+  ✅ src/components/Button.jsx (Button-Komponente)
+  ✅ src/components/Login.jsx (Login-Komponente)
+  ✅ src/pages/HelloWorld.jsx (API-Test-Seite)
+  ✅ src/pages/ApiDocs.jsx (API-Dokumentation)
+  ✅ src/pages/Documentation.jsx (Deutsche Doku)
+  ✅ src/pages/LogViewer.jsx (Log Viewer)
+  ✅ src/main.jsx (Router-Setup)
+  ✅ src/App.jsx (Haupt-App)
+
+6.6 .ENV-DATEIEN ERSTELLEN
+───────────────────────────────────────────────────────────────────────────────
+Erstelle .env.development, .env.testing, .env.production mit allen nötigen
+Variablen (siehe Beispiel in TEIL 5.3).
+
+6.7 PACKAGE.JSON ANPASSEN
+───────────────────────────────────────────────────────────────────────────────
+Füge folgende Scripts hinzu:
+
+"scripts": {
+  "dev": "vite",
+  "dev:server": "node server/index.js",
+  "dev:all": "concurrently \"npm run dev\" \"npm run dev:server\"",
+  "build": "vite build",
+  "preview": "vite preview"
+}
+
+6.8 GIT INITIALISIEREN
+───────────────────────────────────────────────────────────────────────────────
+> git init
+> git config user.name "DEIN_USERNAME"
+> git config user.email "DEINE_EMAIL"
+> git add .
+> git commit -m "feat(project): initial project setup"
+
+6.9 REMOTE REPOSITORY ERSTELLEN
+───────────────────────────────────────────────────────────────────────────────
+> gh repo create mein-landing-project --public --source=. --remote=origin
+> git push origin master
+
+═══════════════════════════════════════════════════════════════════════════════
+  TEIL 7: GIT WORKFLOW & SEMANTIC VERSIONING
+═══════════════════════════════════════════════════════════════════════════════
+
+7.1 SEMANTIC VERSIONING (X.Y.Z)
+───────────────────────────────────────────────────────────────────────────────
+Version in package.json: "version": "0.4.0"
+
+  X = Major (Breaking Changes, große neue Features)
+  Y = Minor (Neue Features, rückwärtskompatibel)
+  Z = Patch (Bugfixes, kleine Updates)
+
+Beispiel:
+  0.1.0 → 0.2.0 (neues Feature hinzugefügt)
+  0.2.0 → 0.2.1 (Bugfix)
+  0.2.1 → 1.0.0 (Breaking Change, Major Release)
+
+7.2 BRANCHING-STRATEGIE
+───────────────────────────────────────────────────────────────────────────────
+  master/main       - Major Releases (1.0.0, 2.0.0)
+  release/X.Y       - Minor Version Development (release/0.2, release/0.3)
+  feature/*         - Neue Features (feature/login, feature/logging)
+  fix/*             - Bugfixes (fix/auth-bug)
+  hotfix/*          - Kritische Fixes für Produktion
+
+7.3 CONVENTIONAL COMMITS
+───────────────────────────────────────────────────────────────────────────────
+Format: <type>(<scope>): <description>
+
+Types:
+  feat     - Neues Feature
+  fix      - Bugfix
+  chore    - Wartung (keine Code-Änderung)
+  docs     - Dokumentation
+  style    - Code-Formatierung
+  refactor - Code-Umstrukturierung
+  test     - Tests hinzufügen
+  perf     - Performance-Verbesserung
+
+Beispiele:
+  > git commit -m "feat(auth): add JWT authentication"
+  > git commit -m "fix(logging): resolve file rotation issue"
+  > git commit -m "docs(readme): update installation instructions"
+
+7.4 COMMIT-WORKFLOW
+───────────────────────────────────────────────────────────────────────────────
+1. Änderungen machen
+2. Dateien stagen:
+   > git add .
+3. Version in package.json anpassen (bei Feature/Fix)
+4. Commit mit Message:
+   > git commit -m "feat(feature): beschreibung"
+5. Sync prüfen:
+   > git fetch origin
+   > git status
+6. Pushen:
+   > git push origin master
+
+7.5 SYNC CHECKING
+───────────────────────────────────────────────────────────────────────────────
+Vor jedem Push prüfen, ob lokal und remote synchron sind:
+
+> git fetch origin
+> git status
+
+Ausgaben:
+  "Your branch is up to date" → Alles sync ✅
+  "Your branch is ahead by X commits" → Lokal ist neuer → Push! ⬆️
+  "Your branch is behind by X commits" → Remote ist neuer → Pull! ⬇️
+
+Bei "behind":
+  > git pull origin master
+
+Bei "ahead":
+  > git push origin master
+
+═══════════════════════════════════════════════════════════════════════════════
+  TEIL 8: HÄUFIGE PROBLEME & LÖSUNGEN
+═══════════════════════════════════════════════════════════════════════════════
+
+8.1 "npm: command not found" oder "npm is not recognized"
+───────────────────────────────────────────────────────────────────────────────
+Problem: Node.js/npm nicht im PATH
+
+Lösung (Windows):
+  > $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+  > node --version
+
+Lösung (Mac/Linux):
+  > export PATH="/usr/local/bin:$PATH"
+  > source ~/.bashrc  # oder ~/.zshrc
+
+8.2 "secretOrPrivateKey must have a value"
+───────────────────────────────────────────────────────────────────────────────
+Problem: JWT_SECRET nicht geladen
+
+Lösung:
+  1. Prüfe, ob .env.development existiert
+  2. Prüfe, ob JWT_SECRET darin definiert ist:
+     JWT_SECRET=dev_secret_key_change_in_production_12345
+  3. Server neustarten (Ctrl+C, dann "npm run dev:all")
+
+8.3 "Port 5000 is already in use"
+───────────────────────────────────────────────────────────────────────────────
+Problem: Port bereits belegt
+
+Lösung:
+  1. Anderen Port in .env.development wählen:
+     PORT=5001
+  2. Auch VITE_API_BASE_URL anpassen:
+     VITE_API_BASE_URL=http://localhost:5001
+
+8.4 "CORS error" oder "Network error"
+───────────────────────────────────────────────────────────────────────────────
+Problem: Frontend kann Backend nicht erreichen
+
+Lösung:
+  1. Prüfe, ob Backend läuft: http://localhost:5000/api/test
+  2. Prüfe CORS-Konfiguration in server/index.js
+  3. Prüfe VITE_API_BASE_URL in .env.development
+
+8.5 Login funktioniert nicht
+───────────────────────────────────────────────────────────────────────────────
+Problem: Credentials falsch oder JWT-Problem
+
+Lösung:
+  1. Verwende exakt diese Credentials:
+     Username: developer
+     Password: dev123
+  2. Prüfe Browser-Console auf Fehler (F12)
+  3. Prüfe Server-Logs im Terminal
+  4. Prüfe JWT_SECRET in .env.development
+
+8.6 Logs werden nicht gespeichert
+───────────────────────────────────────────────────────────────────────────────
+Problem: logs/-Verzeichnisse fehlen
+
+Lösung:
+  1. Verzeichnisse werden automatisch erstellt, aber prüfe:
+     > mkdir logs
+     > mkdir logs\server
+     > mkdir logs\client
+  2. Server neustarten
+  3. Log-Dateien sollten nun in logs/server/ und logs/client/ erscheinen
+
+8.7 Log Viewer zeigt keine Dateien
+───────────────────────────────────────────────────────────────────────────────
+Problem: Keine Log-Dateien vorhanden
+
+Lösung:
+  1. Nutze die App (Login, API-Tests) um Logs zu generieren
+  2. Prüfe logs/server/ und logs/client/ im Dateisystem
+  3. Falls leer, prüfe server/utils/logger.js CONFIG.logsDir
+  4. Server neustarten und erneut testen
+
+═══════════════════════════════════════════════════════════════════════════════
+  TEIL 9: NÜTZLICHE BEFEHLE
+═══════════════════════════════════════════════════════════════════════════════
+
+9.1 NPM BEFEHLE
+───────────────────────────────────────────────────────────────────────────────
+> npm install                     # Alle Abhängigkeiten installieren
+> npm run dev                     # Nur Frontend starten (Vite)
+> npm run dev:server              # Nur Backend starten (Express)
+> npm run dev:all                 # Frontend + Backend gleichzeitig
+> npm run build                   # Production Build erstellen
+> npm run preview                 # Production Build testen
+> npm list                        # Alle installierten Pakete anzeigen
+> npm outdated                    # Veraltete Pakete prüfen
+> npm update                      # Pakete aktualisieren
+
+9.2 GIT BEFEHLE
+───────────────────────────────────────────────────────────────────────────────
+> git status                      # Status prüfen
+> git add .                       # Alle Änderungen stagen
+> git add <datei>                 # Einzelne Datei stagen
+> git commit -m "message"         # Commit mit Message
+> git log --oneline               # Commit-Historie
+> git fetch origin                # Remote-Änderungen holen
+> git pull origin master          # Remote-Änderungen mergen
+> git push origin master          # Lokale Commits pushen
+> git branch                      # Branches anzeigen
+> git checkout -b feature/xyz     # Neuen Branch erstellen
+> git diff                        # Änderungen anzeigen
+
+9.3 GITHUB CLI BEFEHLE
+───────────────────────────────────────────────────────────────────────────────
+> gh auth login                   # Bei GitHub anmelden
+> gh repo create <name>           # Neues Repo erstellen
+> gh repo view                    # Repo-Info anzeigen
+> gh pr list                      # Pull Requests anzeigen
+> gh issue list                   # Issues anzeigen
+
+9.4 SERVER-VERWALTUNG
+───────────────────────────────────────────────────────────────────────────────
+> node server/index.js            # Server manuell starten
+> Ctrl+C                          # Server stoppen
+> node --version                  # Node.js-Version prüfen
+> npm --version                   # npm-Version prüfen
+
+═══════════════════════════════════════════════════════════════════════════════
+  TEIL 10: WEITERE ENTWICKLUNG
+═══════════════════════════════════════════════════════════════════════════════
+
+10.1 NEUE KOMPONENTE HINZUFÜGEN
+───────────────────────────────────────────────────────────────────────────────
+1. Datei erstellen: src/components/NeueKomponente.jsx
+2. CSS erstellen: src/components/NeueKomponente.css
+3. Komponente in Parent-Komponente importieren
+4. Committen:
+   > git add .
+   > git commit -m "feat(components): add neue komponente"
+
+10.2 NEUE SEITE (ROUTE) HINZUFÜGEN
+───────────────────────────────────────────────────────────────────────────────
+1. Datei erstellen: src/pages/NeuePage.jsx
+2. CSS erstellen: src/pages/NeuePage.css
+3. Route in src/main.jsx hinzufügen:
+   <Route path="/neue-seite" element={<NeuePage />} />
+4. Navigation-Button in src/App.jsx:
+   <Button text="Neue Seite →" to="/neue-seite" />
+5. Committen:
+   > git add .
+   > git commit -m "feat(pages): add neue page"
+
+10.3 NEUEN API-ENDPUNKT HINZUFÜGEN
+───────────────────────────────────────────────────────────────────────────────
+1. In server/routes/api.js Endpunkt definieren:
+   router.post('/neue-aktion', auth, async (req, res) => { ... });
+2. In src/services/api.js Client-Funktion hinzufügen:
+   export const apiService = {
+     neueAktion: (data) => api('POST', '/neue-aktion', data)
+   };
+3. In Komponente aufrufen:
+   const result = await apiService.neueAktion(data);
+4. Committen:
+   > git add .
+   > git commit -m "feat(api): add neue aktion endpoint"
+
+10.4 THEME ANPASSEN
+───────────────────────────────────────────────────────────────────────────────
+Farben in src/styles/theme.css ändern:
+
+:root {
+  --accent-primary: #667eea;      /* Haupt-Akzentfarbe */
+  --accent-secondary: #764ba2;    /* Sekundär-Akzentfarbe */
+  --bg-primary: #0a0e27;          /* Haupt-Hintergrund */
+  --bg-secondary: #151a3a;        /* Sekundär-Hintergrund */
+  --text-primary: #ffffff;        /* Haupt-Text */
+}
+
+Speichern → Browser lädt automatisch neu (HMR)
+
+═══════════════════════════════════════════════════════════════════════════════
+  TEIL 11: DEPLOYMENT (PRODUKTION)
+═══════════════════════════════════════════════════════════════════════════════
+
+11.1 PRODUCTION BUILD ERSTELLEN
+───────────────────────────────────────────────────────────────────────────────
+> npm run build
+
+Erstellt optimierten Build in dist/ Ordner.
+
+11.2 PRODUCTION BUILD TESTEN
+───────────────────────────────────────────────────────────────────────────────
+> npm run preview
+
+Testet den Production Build lokal.
+
+11.3 DEPLOYMENT AUF SERVER
+───────────────────────────────────────────────────────────────────────────────
+1. .env.production auf Server kopieren
+2. dist/ Ordner auf Server kopieren
+3. server/ Ordner auf Server kopieren
+4. Auf Server:
+   > cd /pfad/zum/projekt
+   > npm install --production
+   > node server/index.js
+
+11.4 DEPLOYMENT AUF VERCEL/NETLIFY
+───────────────────────────────────────────────────────────────────────────────
+Frontend (Vite):
+  - Vercel: vite.config.js wird automatisch erkannt
+  - Netlify: Build Command: "npm run build", Publish Directory: "dist"
+
+Backend (Express):
+  - Vercel Serverless Functions oder
+  - Separate Backend-Hosting (Render.com, Railway.app, Heroku)
+
+═══════════════════════════════════════════════════════════════════════════════
+  TEIL 12: RESSOURCEN & LINKS
+═══════════════════════════════════════════════════════════════════════════════
+
+OFFIZIELLE DOKUMENTATIONEN:
+  📘 React: https://react.dev
+  📘 Vite: https://vite.dev
+  📘 Express: https://expressjs.com
+  📘 React Router: https://reactrouter.com
+  📘 JWT: https://jwt.io
+
+GITHUB REPOSITORY:
+  🔗 Original: https://github.com/CryseXIII/landing-project
+
+TUTORIALS & GUIDES:
+  📺 React Basics: https://react.dev/learn
+  📺 Node.js Tutorial: https://nodejs.org/en/learn
+  📺 Git Tutorial: https://git-scm.com/docs/gittutorial
+
+COMMUNITY:
+  💬 React Discord: https://discord.gg/react
+  💬 Node.js Discord: https://discord.gg/nodejs
+  💬 Stack Overflow: https://stackoverflow.com
+
+═══════════════════════════════════════════════════════════════════════════════
+  TEIL 13: CHECKLISTE FÜR KOMPLETTE REPLIKATION
+═══════════════════════════════════════════════════════════════════════════════
+
+☐ Node.js installiert (node --version → v24.12.0+)
+☐ npm installiert (npm --version → 11.7.0+)
+☐ Git installiert (git --version → 2.52.0+)
+☐ GitHub CLI installiert (gh --version)
+☐ Repository geklont oder neu erstellt
+☐ npm install ausgeführt (alle Dependencies installiert)
+☐ Git konfiguriert (user.name, user.email)
+☐ Remote Repository verbunden (origin)
+☐ .env.development vorhanden und konfiguriert
+☐ Server startet ohne Fehler (npm run dev:server)
+☐ Frontend startet ohne Fehler (npm run dev)
+☐ Browser öffnet http://localhost:5173
+☐ Login funktioniert (developer / dev123)
+☐ API-Test funktioniert (Increment-Button)
+☐ Log Viewer zeigt Log-Dateien an
+☐ Logs werden in logs/ Ordner gespeichert
+☐ Erster Commit gemacht
+☐ Zu GitHub gepusht
+
+═══════════════════════════════════════════════════════════════════════════════
+  ABSCHLUSS
+═══════════════════════════════════════════════════════════════════════════════
+
+Glückwunsch! 🎉 
+
+Wenn du alle Schritte befolgt hast, solltest du jetzt eine voll funktionsfähige
+Kopie des Landing Projects auf deinem Computer haben.
+
+Bei Fragen oder Problemen:
+  - Prüfe die Logs (Terminal & Browser-Console)
+  - Schaue in den Log Viewer (/log-viewer)
+  - Prüfe die Dokumentation (/documentation)
+  - Schaue in die GitHub Issues
+  - Frage deine Klassenkameraden oder den Lehrer
+
+Viel Erfolg! 🚀
+
+═══════════════════════════════════════════════════════════════════════════════
+  Ende der Anleitung | Version 0.4.0 | Landing Project
+═══════════════════════════════════════════════════════════════════════════════

@@ -98,6 +98,48 @@ The application includes a comprehensive logging infrastructure with:
 - 🎨 **Colors**: ANSI colors (server) and CSS styling (client)
 - 🔍 **Source Tracking**: Every log indicates its origin
 - 📊 **Specialized Methods**: HTTP, API, Auth, Component logging
+- 📁 **File-Based Logging**: Persistent logs with automatic rotation and cleanup
+- 📜 **Live Log Viewer**: Real-time log viewing with auto-refresh
+
+### Log Levels
+
+| Level | Icon | Use Case |
+|-------|------|----------|
+| `debug` | 🐛 | Detailed debugging information |
+| `info` | ℹ️ | General informational messages |
+| `success` | ✅ | Successful operations |
+| `warn` | ⚠️ | Warning messages |
+| `error` | ❌ | Error conditions |
+| `fatal` | 💀 | Critical failures |
+
+### File-Based Logging
+
+All logs are automatically saved to files for persistent debugging and analysis:
+
+- **Server Logs**: `logs/server/server-YYYY-MM-DD.log`
+- **Client Logs**: `logs/client/client-YYYY-MM-DD.log`
+
+#### Automatic Log Management
+
+- **Max File Size**: 100 MB per file
+- **Auto-Rotation**: Files are automatically renamed when reaching 100 MB
+- **Auto-Cleanup**: Files older than 30 days are automatically deleted
+- **Max Files**: Maximum 10 log files retained (oldest deleted first)
+- **Encoding**: UTF-8 (supports all characters including emojis)
+
+#### Log Viewer
+
+Access the live log viewer at `/log-viewer`:
+
+- View all server and client log files
+- See file size and last modification time
+- Auto-refresh with configurable intervals (1s/2s/5s/10s)
+- Auto-scroll to bottom for latest entries
+- Dark theme with syntax highlighting
+
+### Usage Examples
+
+**Client-side (Browser Console):**
 
 ### Server-Side Logging
 

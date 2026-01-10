@@ -39,7 +39,7 @@ export function loadEnvironment() {
 	}
 
 	// Determine env file path
-	const projectRoot = path.resolve(__dirname, '..');
+	const projectRoot = path.resolve(__dirname, '..', '..');
 	const specificEnvFile = path.join(projectRoot, `.env.${detectedEnv}`);
 	const defaultEnvFile = path.join(projectRoot, '.env');
 

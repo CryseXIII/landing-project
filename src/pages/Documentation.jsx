@@ -378,7 +378,66 @@ logger.error('API', 'Request failed', { error });`}</pre>
 				</section>
 
 				<section className="docs-section">
-					<h2>🚀 Neues Projekt erstellen</h2>
+					<h2>� Dateibasiertes Logging</h2>
+					<p>
+						Neben Console-Logging werden alle Logs auch in Dateien gespeichert für spätere Analyse und Debugging.
+					</p>
+
+					<div className="info-card">
+						<h3>Log-Datei-Speicherorte</h3>
+						<ul>
+							<li>📂 <strong>Server-Logs:</strong> <code>logs/server/server-YYYY-MM-DD.log</code></li>
+							<li>📂 <strong>Client-Logs:</strong> <code>logs/client/client-YYYY-MM-DD.log</code></li>
+						</ul>
+						<p>Logs werden täglich in separate Dateien geschrieben (automatisch nach Datum benannt).</p>
+					</div>
+
+					<div className="info-card">
+						<h3>Log-Rotation & Cleanup</h3>
+						<ul>
+							<li>📏 <strong>Max. Dateigröße:</strong> 100 MB pro Log-Datei</li>
+							<li>🔄 <strong>Automatische Rotation:</strong> Wenn eine Datei 100 MB erreicht, wird sie umbenannt (Zeitstempel angehängt) und eine neue Datei erstellt</li>
+							<li>🗑️ <strong>Auto-Delete:</strong> Dateien älter als 30 Tage werden automatisch gelöscht</li>
+							<li>📊 <strong>Max. Anzahl:</strong> Maximal 10 Log-Dateien werden behalten (älteste werden gelöscht)</li>
+							<li>🔤 <strong>Encoding:</strong> UTF-8 (unterstützt alle Zeichen inkl. Umlaute, Emojis)</li>
+						</ul>
+					</div>
+
+					<div className="info-card">
+						<h3>Log Viewer Tool</h3>
+						<p>Auf der <strong>Log Viewer</strong>-Seite (<code>/log-viewer</code>) können alle Logs in Echtzeit angesehen werden:</p>
+						<ul>
+							<li>📜 Liste aller Server- und Client-Log-Dateien</li>
+							<li>📊 Dateigröße und letzte Änderungszeit</li>
+							<li>🔍 Vollständiger Dateiinhalt mit Syntax-Highlighting</li>
+							<li>🔄 Auto-Refresh (1s, 2s, 5s, 10s konfigurierbar)</li>
+							<li>⬇️ Auto-Scroll zum Ende (immer neueste Logs sehen)</li>
+						</ul>
+					</div>
+
+					<div className="example-card">
+						<h4>Log-Datei-Format</h4>
+						<div className="code-block">
+							<pre>{`[2026-01-10T14:37:15.728Z] ✅ [SUCCESS] [Server] Environment loaded: development
+[2026-01-10T14:37:15.738Z] ✅ [SUCCESS] [Server] 🚀 Server running on http://localhost:5000
+[2026-01-10T14:37:16.367Z] ✅ [SUCCESS] [HTTP] POST /client 200 - 5ms
+[2026-01-10T14:37:16.427Z] ⚠️ [WARN] [AuthController] Attempted to get user info without token`}</pre>
+						</div>
+					</div>
+
+					<div className="info-box">
+						<strong>Konfiguration:</strong>
+						<p>Die Log-Einstellungen können in <code>server/utils/logger.js</code> und <code>server/routes/logs.js</code> angepasst werden:</p>
+						<ul>
+							<li><code>maxFileSize</code> - Maximale Dateigröße (Standard: 100 MB)</li>
+							<li><code>maxFiles</code> - Maximale Anzahl Dateien (Standard: 10)</li>
+							<li><code>maxAge</code> - Maximales Alter in Tagen (Standard: 30)</li>
+						</ul>
+					</div>
+				</section>
+
+				<section className="docs-section">
+					<h2>�🚀 Neues Projekt erstellen</h2>
 					
 					<div className="step-list">
 						<div className="step">
