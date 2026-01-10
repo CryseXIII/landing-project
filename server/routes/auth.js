@@ -1,6 +1,7 @@
 import express from 'express';
 import jwt from 'jsonwebtoken';
 import { LoginRequest, LoginResponse } from '../models/api.models.js';
+import { logger } from '../utils/logger.js';
 
 const router = express.Router();
 
@@ -23,12 +24,17 @@ const DEV_USER = {
  * Body: { "username": "developer", "password": "dev123" }
  */
 router.post('/login', (req, res) => {
+	const startTime = Date.now();
+	
 	try {
 		const loginReq = new LoginRequest(req.body);
 		loginReq.validate();
 
+		logger.debug('AuthController', 'Login attempt', { username: loginReq.username });
+
 		// Verify credentials (static user for dev)
 		if (loginReq.username !== DEV_USER.username || loginReq.password !== DEV_USER.password) {
+			logger.auth('Login', loginReq.username, false, { reason: 'Invalid credentials' });
 			return res.status(401).json({
 				error: 'Invalid credentials',
 				message: 'Username or password is incorrect'
@@ -53,9 +59,17 @@ router.post('/login', (req, res) => {
 			maxAge: 24 * 60 * 60 * 1000 // 24 hours
 		});
 
+		const duration = Date.now() - startTime;
+		logger.auth('Login', loginReq.username, true, { duration: `${duration}ms` });
+		logger.api('/auth/login', 'User login', true, duration);
+
 		const response = new LoginResponse(DEV_USER, token);
 		res.json(response);
 	} catch (error) {
+		logger.error('AuthController', 'Login error', {
+			error: error.message,
+			stack: error.stack
+		});
 		res.status(400).json({
 			error: 'Bad Request',
 			message: error.message
@@ -72,7 +86,10 @@ router.post('/login', (req, res) => {
  * @example POST http://localhost:5000/auth/logout
  */
 router.post('/logout', (req, res) => {
+	const username = req.cookies.token ? 'user' : 'anonymous';
+	logger.info('AuthController', `Logout requested by ${username}`);
 	res.clearCookie('token');
+	logger.success('AuthController', 'Logout successful');
 	res.json({ message: 'Logged out successfully' });
 });
 
@@ -88,13 +105,16 @@ router.get('/me', (req, res) => {
 	const token = req.cookies.token;
 	
 	if (!token) {
+		logger.warn('AuthController', 'Attempted to get user info without token');
 		return res.status(401).json({ error: 'Not authenticated' });
 	}
 
 	try {
 		const decoded = jwt.verify(token, process.env.JWT_SECRET);
+		logger.debug('AuthController', 'User info retrieved', { username: decoded.username });
 		res.json({ user: decoded });
 	} catch (error) {
+		logger.error('AuthController', 'Invalid token verification', { error: error.message });
 		res.status(401).json({ error: 'Invalid token' });
 	}
 });

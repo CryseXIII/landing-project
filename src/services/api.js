@@ -1,13 +1,17 @@
 /**
  * API Service Layer
  * Handles all HTTP requests to the backend API
- * Includes authentication, error handling, and request cancellation
+ * Includes authentication, error handling, request cancellation, and logging
  */
 
-const API_BASE_URL = 'http://localhost:5000';
+import { logger } from '../utils/logger.js';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+
+logger.info('API', `API Base URL: ${API_BASE_URL}`);
 
 /**
- * Base fetch wrapper with authentication and error handling
+ * Base fetch wrapper with authentication, error handling, and logging
  * @param {string} endpoint - API endpoint path
  * @param {object} options - Fetch options
  * @param {AbortSignal} signal - AbortController signal for cancellation
@@ -24,21 +28,38 @@ async function apiFetch(endpoint, options = {}, signal = null) {
 		signal,
 	};
 
+	const startTime = performance.now();
+	const method = options.method || 'GET';
+	
+	logger.debug('API', `${method} ${endpoint}`, { options: config });
+
 	try {
 		const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
+		const duration = Math.round(performance.now() - startTime);
 		
 		if (!response.ok) {
 			const error = await response.json();
+			logger.api(method, endpoint, response.status, duration);
+			logger.error('API', `Request failed: ${method} ${endpoint}`, {
+				status: response.status,
+				error: error.message
+			});
 			throw new Error(error.message || 'API request failed');
 		}
 
+		logger.api(method, endpoint, response.status, duration);
+		logger.success('API', `${method} ${endpoint} succeeded (${duration}ms)`);
+		
 		return await response.json();
 	} catch (error) {
 		if (error.name === 'AbortError') {
-			console.log('Request cancelled');
+			logger.warn('API', `Request cancelled: ${method} ${endpoint}`);
 			throw error;
 		}
-		console.error('API Error:', error);
+		logger.error('API', `Request error: ${method} ${endpoint}`, {
+			error: error.message,
+			stack: error.stack
+		});
 		throw error;
 	}
 }
