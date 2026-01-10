@@ -26,8 +26,9 @@ function App() {
 					Edit <code>src/App.jsx</code> and save to test HMR
 				</p>
 			</div>
-			<div style={{ marginTop: '20px' }}>
+			<div style={{ marginTop: '20px', display: 'flex', gap: '12px', flexWrap: 'wrap', justifyContent: 'center' }}>
 				<Button text="Go to Hello World →" to="/hello" />
+				<Button text="API Documentation →" to="/api-docs" />
 			</div>
 			<p className="read-the-docs">
 				Click on the Vite and React logos to learn more
