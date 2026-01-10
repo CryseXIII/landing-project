@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api, authApi } from '../services/api';
+import { logger } from '../utils/logger.js';
 import './HelloWorld.css';
 
 function HelloWorld() {
@@ -12,21 +13,32 @@ function HelloWorld() {
 	const [error, setError] = useState(null);
 
 	useEffect(() => {
+		logger.route('/hello', 'HelloWorld page loaded');
 		// Check if user is authenticated
 		authApi.getCurrentUser()
-			.then(data => setUser(data.user))
-			.catch(() => setUser(null));
+			.then(data => {
+				setUser(data.user);
+				logger.component('HelloWorld', 'User authenticated', { username: data.user.username });
+			})
+			.catch(() => {
+				setUser(null);
+				logger.debug('HelloWorld', 'No user session found');
+			});
 	}, []);
 
 	const handleIncrement = async () => {
 		setLoading(true);
 		setError(null);
 		
+		logger.component('HelloWorld', 'Increment button clicked', { number });
+		
 		try {
 			const response = await api.increment(number);
 			setResult(response);
+			logger.success('HelloWorld', 'Increment successful', { result: response });
 		} catch (err) {
 			setError(err.message);
+			logger.error('HelloWorld', 'Increment failed', { error: err.message });
 		} finally {
 			setLoading(false);
 		}

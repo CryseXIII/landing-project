@@ -6,12 +6,14 @@ import './index.css'
 import App from './App.jsx'
 import HelloWorld from './pages/HelloWorld.jsx'
 import ApiDocs from './pages/ApiDocs.jsx'
+import Login from './components/Login.jsx'
 
 createRoot(document.getElementById('root')).render(
 	<StrictMode>
 		<BrowserRouter>
 			<Routes>
 				<Route path="/" element={<App />} />
+				<Route path="/login" element={<Login />} />
 				<Route path="/hello" element={<HelloWorld />} />
 				<Route path="/api-docs" element={<ApiDocs />} />
 			</Routes>
