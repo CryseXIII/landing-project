@@ -12,7 +12,7 @@ function LogViewer() {
 	const [autoRefresh, setAutoRefresh] = useState(true);
 	const [refreshInterval, setRefreshInterval] = useState(2000); // 2 seconds
 	const logContainerRef = useRef(null);
-	const [isAutoScroll, setIsAutoScroll] = useState(true);
+	const [isAutoScroll, setIsAutoScroll] = useState(false);
 
 	// Function declarations before useEffect hooks
 	const fetchLogContent = useCallback(async (type, filename) => {
