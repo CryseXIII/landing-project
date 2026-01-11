@@ -1,0 +1,469 @@
+═══════════════════════════════════════════════════════════════════════════════
+  LANDING PROJECT - VOLLAUTOMATISCHES SETUP-SCRIPT FÜR COPILOT
+  Version 0.4.0 | Erstellt: Januar 2026
+═══════════════════════════════════════════════════════════════════════════════
+
+ANWEISUNG FÜR COPILOT:
+Führe alle folgenden Befehle automatisch nacheinander aus.
+Warte nach jedem CHECKPOINT auf erfolgreiche Ausführung, dann fahre fort.
+Erstelle alle Dateien mit TAB-Indentation (\t), nicht mit Spaces.
+
+═══════════════════════════════════════════════════════════════════════════════
+CHECKPOINT 1: TOOLS INSTALLIEREN
+═══════════════════════════════════════════════════════════════════════════════
+
+winget install --id OpenJS.NodeJS.LTS --silent --accept-package-agreements --accept-source-agreements
+winget install --id Git.Git --silent --accept-package-agreements --accept-source-agreements
+winget install --id GitHub.cli --silent --accept-package-agreements --accept-source-agreements
+
+$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+
+node --version
+npm --version
+git --version
+
+═══════════════════════════════════════════════════════════════════════════════
+CHECKPOINT 2: PROJEKT-VERZEICHNIS ERSTELLEN
+═══════════════════════════════════════════════════════════════════════════════
+
+cd $HOME\Desktop
+mkdir landing-project
+cd landing-project
+
+═══════════════════════════════════════════════════════════════════════════════
+CHECKPOINT 3: VITE + REACT INITIALISIEREN
+═══════════════════════════════════════════════════════════════════════════════
+
+npm create vite@latest . -- --template react
+npm install
+
+═══════════════════════════════════════════════════════════════════════════════
+CHECKPOINT 4: ABHÄNGIGKEITEN INSTALLIEREN
+═══════════════════════════════════════════════════════════════════════════════
+
+npm install react-router-dom
+npm install express cors dotenv cookie-parser jsonwebtoken
+npm install --save-dev concurrently
+
+═══════════════════════════════════════════════════════════════════════════════
+CHECKPOINT 5: VERZEICHNISSTRUKTUR ERSTELLEN
+═══════════════════════════════════════════════════════════════════════════════
+
+mkdir server
+mkdir server\config
+mkdir server\middleware
+mkdir server\models
+mkdir server\routes
+mkdir server\utils
+mkdir src\components
+mkdir src\pages
+mkdir src\services
+mkdir src\styles
+mkdir src\utils
+mkdir logs
+mkdir logs\server
+mkdir logs\client
+
+═══════════════════════════════════════════════════════════════════════════════
+CHECKPOINT 6: PACKAGE.JSON ANPASSEN
+═══════════════════════════════════════════════════════════════════════════════
+
+Ersetze den "scripts"-Block in package.json mit:
+
+"scripts": {
+	"dev": "vite",
+	"dev:server": "node server/index.js",
+	"dev:all": "concurrently \"npm run dev\" \"npm run dev:server\"",
+	"build": "vite build",
+	"preview": "vite preview"
+}
+
+Setze Version auf: "version": "0.4.0"
+
+═══════════════════════════════════════════════════════════════════════════════
+CHECKPOINT 7: ENV-DATEIEN ERSTELLEN
+═══════════════════════════════════════════════════════════════════════════════
+
+Erstelle .env.development mit folgendem Inhalt:
+
+NODE_ENV=development
+PORT=5000
+VITE_API_BASE_URL=http://localhost:5000
+LOG_LEVEL_SERVER=debug
+VITE_LOG_LEVEL_CLIENT=debug
+JWT_SECRET=dev_secret_key_change_in_production_12345
+JWT_EXPIRY=24h
+ENABLE_DEBUG_PANEL=true
+ENABLE_SOURCE_MAPS=true
+
+Erstelle .env.testing mit folgendem Inhalt:
+
+NODE_ENV=testing
+PORT=5000
+VITE_API_BASE_URL=http://localhost:5000
+LOG_LEVEL_SERVER=debug
+VITE_LOG_LEVEL_CLIENT=debug
+JWT_SECRET=test_secret_key_change_in_production_67890
+JWT_EXPIRY=24h
+ENABLE_DEBUG_PANEL=true
+ENABLE_SOURCE_MAPS=true
+
+Erstelle .env.production mit folgendem Inhalt:
+
+NODE_ENV=production
+PORT=5000
+VITE_API_BASE_URL=https://your-domain.com
+LOG_LEVEL_SERVER=error
+VITE_LOG_LEVEL_CLIENT=error
+JWT_SECRET=CHANGE_THIS_IN_PRODUCTION_USE_STRONG_SECRET
+JWT_EXPIRY=24h
+ENABLE_DEBUG_PANEL=false
+ENABLE_SOURCE_MAPS=false
+
+═══════════════════════════════════════════════════════════════════════════════
+CHECKPOINT 8: SERVER-KONFIGURATION ERSTELLEN
+═══════════════════════════════════════════════════════════════════════════════
+
+Erstelle server/config/env-loader.js mit folgendem Code:
+
+import { fileURLToPath } from 'url';
+import { dirname, resolve } from 'path';
+import dotenv from 'dotenv';
+import fs from 'fs';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+export function loadEnvironment() {
+	const platform = process.platform;
+	let envFile;
+
+	if (platform === 'win32') {
+		envFile = '.env.development';
+	} else if (platform === 'darwin') {
+		envFile = '.env.testing';
+	} else {
+		envFile = '.env.production';
+	}
+
+	const envPath = resolve(__dirname, '../../', envFile);
+
+	if (!fs.existsSync(envPath)) {
+		console.error(`❌ Environment file not found: ${envPath}`);
+		process.exit(1);
+	}
+
+	const result = dotenv.config({ path: envPath });
+
+	if (result.error) {
+		console.error('❌ Error loading environment file:', result.error);
+		process.exit(1);
+	}
+
+	console.log(`✅ Environment loaded: ${process.env.NODE_ENV} (${platform})`);
+	console.log({
+		envFile,
+		config: {
+			port: process.env.PORT,
+			apiBaseUrl: process.env.VITE_API_BASE_URL,
+			logLevelServer: process.env.LOG_LEVEL_SERVER,
+			logLevelClient: process.env.VITE_LOG_LEVEL_CLIENT,
+			enableSourceMaps: process.env.ENABLE_SOURCE_MAPS === 'true',
+			jwtExpiry: process.env.JWT_EXPIRY
+		}
+	});
+
+	return result.parsed;
+}
+
+═══════════════════════════════════════════════════════════════════════════════
+CHECKPOINT 9: SERVER-LOGGER ERSTELLEN
+═══════════════════════════════════════════════════════════════════════════════
+
+Erstelle server/utils/logger.js mit folgendem Code:
+
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const CONFIG = {
+	logsDir: path.resolve(__dirname, '../../logs/server'),
+	maxFileSize: 100 * 1024 * 1024,
+	maxFiles: 10,
+	maxAge: 30 * 24 * 60 * 60 * 1000,
+	encoding: 'utf8'
+};
+
+function ensureLogsDirectory() {
+	if (!fs.existsSync(CONFIG.logsDir)) {
+		fs.mkdirSync(CONFIG.logsDir, { recursive: true });
+	}
+}
+
+function getCurrentLogFile() {
+	const date = new Date().toISOString().split('T')[0];
+	return path.join(CONFIG.logsDir, `server-${date}.log`);
+}
+
+function getFileSize(filePath) {
+	try {
+		const stats = fs.statSync(filePath);
+		return stats.size;
+	} catch {
+		return 0;
+	}
+}
+
+function getFileAge(filePath) {
+	try {
+		const stats = fs.statSync(filePath);
+		return Date.now() - stats.mtime.getTime();
+	} catch {
+		return 0;
+	}
+}
+
+function rotateLogFile(filePath) {
+	try {
+		const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+		const newPath = filePath.replace('.log', `-${timestamp}.log`);
+		fs.renameSync(filePath, newPath);
+	} catch (err) {
+		console.error('Failed to rotate log file:', err);
+	}
+}
+
+function cleanOldLogs() {
+	try {
+		const files = fs.readdirSync(CONFIG.logsDir)
+			.filter(f => f.startsWith('server-') && f.endsWith('.log'))
+			.map(f => ({
+				name: f,
+				path: path.join(CONFIG.logsDir, f),
+				mtime: fs.statSync(path.join(CONFIG.logsDir, f)).mtime.getTime()
+			}))
+			.sort((a, b) => b.mtime - a.mtime);
+
+		files.forEach(file => {
+			const age = getFileAge(file.path);
+			if (age > CONFIG.maxAge) {
+				fs.unlinkSync(file.path);
+			}
+		});
+
+		if (files.length > CONFIG.maxFiles) {
+			files.slice(CONFIG.maxFiles).forEach(file => {
+				fs.unlinkSync(file.path);
+			});
+		}
+	} catch (err) {
+		console.error('Failed to clean old logs:', err);
+	}
+}
+
+function writeToFile(message) {
+	try {
+		ensureLogsDirectory();
+		const logFile = getCurrentLogFile();
+		const fileSize = getFileSize(logFile);
+
+		if (fileSize >= CONFIG.maxFileSize) {
+			rotateLogFile(logFile);
+		}
+
+		fs.appendFileSync(logFile, message + '\n', { encoding: CONFIG.encoding });
+		cleanOldLogs();
+	} catch (err) {
+		console.error('Failed to write to log file:', err);
+	}
+}
+
+const levels = {
+	debug: { icon: '🐛', color: '\x1b[36m', name: 'DEBUG' },
+	info: { icon: 'ℹ️', color: '\x1b[34m', name: 'INFO' },
+	success: { icon: '✅', color: '\x1b[32m', name: 'SUCCESS' },
+	warn: { icon: '⚠️', color: '\x1b[33m', name: 'WARN' },
+	error: { icon: '❌', color: '\x1b[31m', name: 'ERROR' },
+	fatal: { icon: '💀', color: '\x1b[35m', name: 'FATAL' }
+};
+
+function log(level, source, message, data = null) {
+	const timestamp = new Date().toISOString();
+	const levelInfo = levels[level] || levels.info;
+	const logLevel = process.env.LOG_LEVEL_SERVER || 'info';
+	const logLevelPriority = ['debug', 'info', 'success', 'warn', 'error', 'fatal'];
+
+	if (logLevelPriority.indexOf(level) < logLevelPriority.indexOf(logLevel)) {
+		return;
+	}
+
+	const consoleMessage = `${levelInfo.icon} [${timestamp}] ${levelInfo.color}[${levelInfo.name}]\x1b[0m [${source}] ${message}`;
+	console.log(consoleMessage);
+	if (data) {
+		console.log(data);
+	}
+
+	const fileMessage = `${levelInfo.icon} [${timestamp}] [${levelInfo.name}] [${source}] ${message}${data ? ' ' + JSON.stringify(data) : ''}`;
+	writeToFile(fileMessage);
+}
+
+export const logger = {
+	debug: (source, message, data) => log('debug', source, message, data),
+	info: (source, message, data) => log('info', source, message, data),
+	success: (source, message, data) => log('success', source, message, data),
+	warn: (source, message, data) => log('warn', source, message, data),
+	error: (source, message, data) => log('error', source, message, data),
+	fatal: (source, message, data) => log('fatal', source, message, data),
+	http: (method, path, status, duration) => {
+		const level = status >= 500 ? 'error' : status >= 400 ? 'warn' : 'success';
+		log(level, 'HTTP', `${method} ${path} ${status} - ${duration}ms`);
+	},
+	api: (endpoint, method, status, data) => {
+		const level = status >= 400 ? 'error' : 'success';
+		log(level, 'API', `${method} ${endpoint} - ${status}`, data);
+	},
+	auth: (action, details, data) => {
+		log('info', 'Auth', `${action}: ${details}`, data);
+	},
+	getConfig: () => CONFIG,
+	cleanup: cleanOldLogs
+};
+
+ensureLogsDirectory();
+cleanOldLogs();
+
+═══════════════════════════════════════════════════════════════════════════════
+CHECKPOINT 10: CLIENT-LOGGER ERSTELLEN
+═══════════════════════════════════════════════════════════════════════════════
+
+Erstelle src/utils/logger.js mit folgendem Code:
+
+const levels = {
+	debug: { icon: '🐛', color: '#00bcd4', name: 'DEBUG' },
+	info: { icon: 'ℹ️', color: '#2196f3', name: 'INFO' },
+	success: { icon: '✅', color: '#4caf50', name: 'SUCCESS' },
+	warn: { icon: '⚠️', color: '#ff9800', name: 'WARN' },
+	error: { icon: '❌', color: '#f44336', name: 'ERROR' },
+	fatal: { icon: '💀', color: '#9c27b0', name: 'FATAL' }
+};
+
+async function sendToServer(level, source, message, data) {
+	try {
+		const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+		await fetch(`${apiBaseUrl}/logs/client`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				level,
+				source,
+				message,
+				data,
+				timestamp: new Date().toISOString(),
+				userAgent: navigator.userAgent,
+				url: window.location.href
+			})
+		});
+	} catch (err) {
+		console.error('Failed to send log to server:', err);
+	}
+}
+
+function log(level, source, message, data = null) {
+	const timestamp = new Date().toISOString();
+	const levelInfo = levels[level] || levels.info;
+	const logLevel = import.meta.env.VITE_LOG_LEVEL_CLIENT || 'info';
+	const logLevelPriority = ['debug', 'info', 'success', 'warn', 'error', 'fatal'];
+
+	if (logLevelPriority.indexOf(level) < logLevelPriority.indexOf(logLevel)) {
+		return;
+	}
+
+	const styles = [
+		`color: ${levelInfo.color}`,
+		'font-weight: bold'
+	].join(';');
+
+	console.log(
+		`${levelInfo.icon} [${timestamp}] %c[${levelInfo.name}]%c [${source}] ${message}`,
+		styles,
+		'',
+		data || ''
+	);
+
+	sendToServer(level, source, message, data);
+}
+
+export const logger = {
+	debug: (source, message, data) => log('debug', source, message, data),
+	info: (source, message, data) => log('info', source, message, data),
+	success: (source, message, data) => log('success', source, message, data),
+	warn: (source, message, data) => log('warn', source, message, data),
+	error: (source, message, data) => log('error', source, message, data),
+	fatal: (source, message, data) => log('fatal', source, message, data),
+	api: (endpoint, method, status, data) => {
+		const level = status >= 400 ? 'error' : 'success';
+		log(level, 'API', `${method} ${endpoint} - ${status}`, data);
+	},
+	auth: (action, details, data) => {
+		log('info', 'Auth', `${action}: ${details}`, data);
+	},
+	component: (name, action, data) => {
+		log('debug', `Component:${name}`, action, data);
+	},
+	route: (path, action, data) => {
+		log('info', 'Router', `${path} - ${action}`, data);
+	},
+	performance: (metric, value, unit = 'ms') => {
+		log('info', 'Performance', `${metric}: ${value}${unit}`);
+	}
+};
+
+═══════════════════════════════════════════════════════════════════════════════
+HINWEIS: DIE FOLGENDEN DATEIEN SIND ZU LANG FÜR DIESE DATEI
+═══════════════════════════════════════════════════════════════════════════════
+
+Sage zu Copilot: "Erstelle jetzt alle fehlenden Dateien basierend auf dem 
+GitHub-Repository https://github.com/CryseXIII/landing-project"
+
+Copilot sollte automatisch folgende Dateien erstellen:
+
+SERVER-DATEIEN:
+- server/index.js (Express-Server mit allen Routes)
+- server/middleware/auth.js (JWT-Middleware)
+- server/models/api.models.js (Request/Response-Modelle)
+- server/routes/auth.js (Login/Logout/Me Endpoints)
+- server/routes/api.js (API Endpoints)
+- server/routes/logs.js (Log-Management Endpoints)
+
+CLIENT-DATEIEN:
+- src/main.jsx (Router Setup)
+- src/App.jsx (Haupt-App mit Auth)
+- src/services/api.js (API Service Layer)
+- src/components/Button.jsx + .css
+- src/components/Login.jsx + .css
+- src/pages/HelloWorld.jsx + .css
+- src/pages/ApiDocs.jsx + .css
+- src/pages/Documentation.jsx + .css
+- src/pages/LogViewer.jsx + .css
+- src/styles/theme.css
+
+═══════════════════════════════════════════════════════════════════════════════
+CHECKPOINT 11: GIT INITIALISIEREN
+═══════════════════════════════════════════════════════════════════════════════
+
+git init
+git config user.name "Student"
+git config user.email "student@example.com"
+git add .
+git commit -m "feat(project): initial project setup with full-stack architecture"
+
+═══════════════════════════════════════════════════════════════════════════════
+CHECKPOINT 12: SERVER STARTEN
+═══════════════════════════════════════════════════════════════════════════════
+
+npm run dev:all
+
+FERTIG! Browser öffnet automatisch auf http://localhost:5173
