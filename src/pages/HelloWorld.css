@@ -39,7 +39,6 @@
 	padding: var(--spacing-md);
 	border-radius: var(--radius-md);
 	margin-bottom: var(--spacing-lg);
-	text-align: center;
 }
 
 .api-test {
@@ -132,7 +131,6 @@
 	padding: var(--spacing-lg);
 	border-radius: var(--radius-lg);
 	margin-bottom: var(--spacing-lg);
-	text-align: center;
 }
 
 .hint {
